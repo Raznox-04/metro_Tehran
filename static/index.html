@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="مسیریاب متروی تهران - پیدا کردن بهترین مسیر بین ایستگاه‌های مترو">
+  <title>مسیریاب متروی تهران</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://noza.ir/Alefbasystem/images/clients/11.png" alt="لوگوی متروی تهران" class="logo">
+      <h1>مسیریاب متروی تهران</h1>
+    </div>
+
+    <div class="app-description">
+      بهترین و کوتاه‌ترین مسیر بین ایستگاه‌های متروی تهران
+    </div>
+
+    <div class="form-section">
+      <form id="route-form">
+        <div class="form-group">
+          <label for="from">ایستگاه مبدا:</label>
+          <input type="text" id="from" placeholder="نام ایستگاه مبدا" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="to">ایستگاه مقصد:</label>
+          <input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off">
+        </div>
+
+        <button type="submit" id="submit-btn">پیدا کردن مسیر</button>
+      </form>
+    </div>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('route-form');
+      const resultDiv = document.getElementById('result');
+      const submitBtn = document.getElementById('submit-btn');
+      const fromInput = document.getElementById('from');
+      const toInput = document.getElementById('to');
+
+      // ایجاد لیست پیشنهاد برای ورودی‌ها
+      function setupAutocomplete(input) {
+        let currentFocus;
+
+        input.addEventListener("input", function() {
+          const val = this.value;
+          closeAllLists();
+          if (!val || val.length < 2) return false;
+
+          currentFocus = -1;
+
+          fetch(`/api/stations/search?query=${encodeURIComponent(val)}`)
+            .then(res => {
+              if (!res.ok) throw new Error('خطا در جستجو');
+              return res.json();
+            })
+            .then(data => {
+              const list = document.createElement("div");
+              list.setAttribute("id", this.id + "-autocomplete-list");
+              list.setAttribute("class", "autocomplete-items");
+              this.parentNode.appendChild(list);
+
+              if (data.stations && data.stations.length > 0) {
+                data.stations.forEach(station => {
+                  const item = document.createElement("div");
+                  item.innerHTML = station;
+                  item.innerHTML += "<input type='hidden' value='" + station + "'>";
+                  item.addEventListener("click", function() {
+                    input.value = this.getElementsByTagName("input")[0].value;
+                    closeAllLists();
+                  });
+                  list.appendChild(item);
+                });
+              } else {
+                const item = document.createElement("div");
+                item.innerHTML = "ایستگاهی یافت نشد";
+                item.style.color = "#5a6783";
+                item.style.cursor = "default";
+                list.appendChild(item);
+              }
+            })
+            .catch(err => {
+              console.error('Error in autocomplete:', err);
+              fallbackAutocomplete(input, val);
+            });
+        });
+
+        // Fallback function if API fails
+        function fallbackAutocomplete(input, val) {
+          const commonStations = [
+            "تجریش", "قیطریه", "شهید صدر", "قلهک", "میرداماد", "شهید همت",
+            "شریعتی", "دروازه شمیران", "پانزده خرداد", "خیام", "میدان محمدیه",
+            "شوش", "پایانه جنوب", "بیمه", "دکتر حبیب‌الله", "میدان حر",
+            "توحید", "میدان صنعت", "یادگار امام", "شهرک غرب", "ایوانک",
+            "امام خمینی", "میدان انقلاب", "میدان آزادی", "شهید حقانی",
+            "تهرانپارس", "فردوسی", "طالقانی", "شهید باهنر", "دروازه دولت",
+            "کهریزک", "صادقیه", "فرهنگسرا", "قائم", "آزادگان", "شهید کلاهدوز",
+            "علامه جعفری", "شهید سلیمانی", "شهدای دولت‌آباد", "کوهسار", "بسیج",
+            "میدان کتاب", "شهید بهشتی", "میدان جهاد"
+          ];
+
+          const list = document.createElement("div");
+          list.setAttribute("id", input.id + "-autocomplete-list");
+          list.setAttribute("class", "autocomplete-items");
+          input.parentNode.appendChild(list);
+
+          const matches = commonStations.filter(station =>
+            station.toLowerCase().includes(val.toLowerCase())
+          );
+
+          if (matches.length > 0) {
+            matches.forEach(station => {
+              const item = document.createElement("div");
+                  item.innerHTML = station;
+                  item.innerHTML += "<input type='hidden' value='" + station + "'>";
+                  item.addEventListener("click", function() {
+                    input.value = this.getElementsByTagName("input")[0].value;
+                    closeAllLists();
+                  });
+                  list.appendChild(item);
+                });
+              } else {
+                const item = document.createElement("div");
+                item.innerHTML = "ایستگاهی یافت نشد";
+                item.style.color = "#5a6783";
+                item.style.cursor = "default";
+                list.appendChild(item);
+              }
+            }
+
+        input.addEventListener("keydown", function(e) {
+          let items = document.getElementById(this.id + "-autocomplete-list");
+          if (items) items = items.getElementsByTagName("div");
+
+          if (e.keyCode == 40) {
+            currentFocus++;
+            addActive(items);
+          } else if (e.keyCode == 38) { // فلش بالا
+            currentFocus--;
+            addActive(items);
+          } else if (e.keyCode == 13) { // اینتر
+            e.preventDefault();
+            if (currentFocus > -1 && items) {
+              items[currentFocus].click();
+            }
+          }
+        });
+
+        function addActive(items) {
+          if (!items) return false;
+          removeActive(items);
+          if (currentFocus >= items.length) currentFocus = 0;
+          if (currentFocus < 0) currentFocus = items.length - 1;
+          items[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(items) {
+          for (let i = 0; i < items.length; i++) {
+            items[i].classList.remove("autocomplete-active");
+          }
+        }
+
+        function closeAllLists(elmnt) {
+          const items = document.getElementsByClassName("autocomplete-items");
+          for (let i = 0; i < items.length; i++) {
+            if (elmnt != items[i] && elmnt != input) {
+              items[i].parentNode.removeChild(items[i]);
+            }
+          }
+        }
+
+        document.addEventListener("click", function(e) {
+          closeAllLists(e.target);
+        });
+      }
+
+      // راه‌اندازی autocomplete برای هر دو فیلد
+      setupAutocomplete(fromInput);
+      setupAutocomplete(toInput);
+
+      // مدیریت ارسال فرم
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const from = fromInput.value.trim();
+        const to = toInput.value.trim();
+
+        if (!from || !to) {
+          showError('لطفاً هر دو ایستگاه را وارد کنید');
+          return;
+        }
+
+        if (from === to) {
+          showError('ایستگاه مبدا و مقصد نمی‌توانند یکسان باشند');
+          return;
+        }
+
+        setLoadingState(true);
+
+        try {
+          const res = await fetch(`/api/route/details?from_station=${encodeURIComponent(from)}&to_station=${encodeURIComponent(to)}`);
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.detail || 'خطا در دریافت مسیر');
+          }
+
+          showRoute(data);
+
+        } catch (err) {
+          console.error('خطا در ارتباط با سرور:', err);
+          showError(err.message || 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
+        } finally {
+          setLoadingState(false);
+        }
+      });
+
+      function setLoadingState(isLoading) {
+        if (isLoading) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = 'در حال جستجو <span class="loading"></span>';
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'پیدا کردن مسیر';
+        }
+      }
+
+      function showError(message) {
+        resultDiv.innerHTML = `<div class="error">${message}</div>`;
+      }
+
+      function showRoute(data) {
+        const { route, route_details, stops, total_stations } = data;
+
+        let routeHTML = `
+          <div class="route-info">
+            <div class="route-summary">
+              <div class="summary-item">
+                <span class="summary-value">${total_stations}</span>
+                <span class="summary-label">ایستگاه</span>
+              </div>
+            </div>
+          </div>ب
+        `;
+
+        // گروه‌بندی مسیر بر اساس خطوط
+        const routeGroups = groupRouteByLines(route_details);
+
+        routeHTML += `<div class="route-sections">`;
+
+        routeGroups.forEach((group) => {
+          const lineNumber = group.lines[0];
+          const lineName = getLineName(lineNumber);
+          const lineColor = getLineColor(lineNumber);
+
+          routeHTML += `
+            <div class="route-section">
+              <div class="line-header" style="background-color: ${lineColor}">
+                <span>${lineName}</span>
+              </div>
+              <ul class="station-list">
+          `;
+
+          group.stations.forEach((station, stationIndex) => {
+            const lineBadges = station.lines.map(line =>
+              `<span class="line-badge line-${line}">${getLineName(line)}</span>`
+            ).join('');
+
+            routeHTML += `
+              <li>
+                <div class="station-info">
+                  ${lineBadges}
+                  <span>${station.name}</span>
+                </div>
+                <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">${stationIndex + 1}</span>
+              </li>
+            `;
+          });
+
+          routeHTML += `
+              </ul>
+            </div>
+          `;
+        });
+
+        routeHTML += `</div>`;
+        resultDiv.innerHTML = routeHTML;
+      }
+
+      // توابع کمکی
+      function groupRouteByLines(routeDetails) {
+        const groups = [];
+        let currentGroup = {
+          lines: routeDetails[0]?.lines || [1],
+          stations: []
+        };
+
+        routeDetails.forEach((station, index) => {
+          if (!arraysEqual(currentGroup.lines, station.lines)) {
+            groups.push(currentGroup);
+            currentGroup = {
+              lines: station.lines,
+              stations: []
+            };
+          }
+
+          currentGroup.stations.push(station);
+
+          if (index === routeDetails.length - 1) {
+            groups.push(currentGroup);
+          }
+        });
+
+        return groups;
+      }
+
+      function arraysEqual(arr1, arr2) {
+        if (arr1.length !== arr2.length) return false;
+        return arr1.every((value, index) => value === arr2[index]);
+      }
+
+      function getLineName(lineNumber) {
+        const lineNames = {
+          1: "خط ۱",
+          2: "خط ۲",
+          3: "خط ۳",
+          4: "خط ۴",
+          5: "خط ۵",
+          6: "خط ۶",
+          7: "خط ۷"
+        };
+        return lineNames[lineNumber] || `خط ${lineNumber}`;
+      }
+
+      function getLineColor(lineNumber) {
+        const lineColors = {
+          1: "#E0001F",
+          2: "#2F4389",
+          3: "#67C5F5",
+          4: "#F8E100",
+          5: "#007E46",
+          6: "#EF639F",
+          7: "#7F0B74"
+        };
+        return lineColors[lineNumber] || "#E0001F";
+      }
+      fromInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab' && !e.shiftKey) {
+          e.preventDefault();
+          toInput.focus();
+        }
+      });
+
+      toInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab' && e.shiftKey) {
+          e.preventDefault();
+          fromInput.focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
