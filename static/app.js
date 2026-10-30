@@ -85,8 +85,11 @@
       const info=details.find(x=>x.name===name)||{},lines=info.lines||[],isTransfer=transferNames.has(name)||(info.is_transfer&&i>0&&i<route.length-1);
       const label=i===0?"مبدأ":i===route.length-1?"مقصد":isTransfer?"ایستگاه تعویض خط":"";
       const transfer=transfers.find(t=>t.station===name);
-      const badges=lines.map(n=>'<span class="mini-line" style="--line-color:'+colors[n]+'">'+lineName(n)+'</span>').join("");
-      return '<div class="timeline-item"><span class="timeline-marker '+(i===0||i===route.length-1?"end":isTransfer?"transfer":"")+'" style="--station-color:'+(colors[lines[0]]||"#718096")+'"></span><div class="timeline-copy"><div><strong>'+esc(name)+'</strong><br><small>'+label+'</small></div><div class="timeline-lines">'+badges+'</div></div></div>'+(transfer?'<div class="transfer-row"><span>تعویض '+lineName(transfer.from_line)+' به '+lineName(transfer.to_line)+'</span><b>'+mins((transfer.transfer_minutes||0)+(transfer.waiting_minutes||0))+'</b></div>':"");
+      // در ایستگاه تقاطعی، خط‌های قابل دسترس را به‌عنوان مسیر انتخابی نمایش نمی‌دهیم.
+      // خط ورود/خروج فقط در دستور تعویض خط مشخص می‌شود تا مسافر سردرگم نشود.
+      const badges=isTransfer&&!transfer?'':lines.slice(0,1).map(n=>'<span class="mini-line" style="--line-color:'+colors[n]+'">'+lineName(n)+'</span>').join("");
+      const transferInstruction=transfer?'<div class="transfer-row"><span>در این ایستگاه از <b>'+lineName(transfer.from_line)+'</b> به <b>'+lineName(transfer.to_line)+'</b> برو</span><b>'+mins((transfer.transfer_minutes||0)+(transfer.waiting_minutes||0))+'</b></div>':"";
+      return '<div class="timeline-item"><span class="timeline-marker '+(i===0||i===route.length-1?"end":isTransfer?"transfer":"")+'" style="--station-color:'+(colors[lines[0]]||"#718096")+'"></span><div class="timeline-copy"><div><strong>'+esc(name)+'</strong><br><small>'+label+'</small></div><div class="timeline-lines">'+badges+'</div></div></div>'+transferInstruction;
     }).join("");
     const lines=[...new Set(route.flatMap(n=>(details.find(d=>d.name===n)||{}).lines||[]))].sort();
     renderLegend($("#line-legend-items"),lines);
