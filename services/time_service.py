@@ -108,7 +108,8 @@ class MetroTimeService:
             for line in lines:
                 graph.add_node((station, line))
 
-        # Ride edges: only connect adjacent stations that share a line.
+        # Ride edges: add both directions, even if source JSON has a one-way relation.
+        seen_connections = set()
         for station, info in station_data.items():
             for neighbor in info.get("relations", []):
                 if neighbor not in station_data:
@@ -117,15 +118,20 @@ class MetroTimeService:
                     station_data[neighbor].get("lines", [])
                 )
                 for line in common_lines:
+                    connection_key = (min(station, neighbor), max(station, neighbor), line)
+                    if connection_key in seen_connections:
+                        continue
+                    seen_connections.add(connection_key)
                     minutes = self._segment_minutes(station, neighbor)
-                    graph.add_edge(
-                        (station, line),
-                        (neighbor, line),
-                        weight=minutes,
-                        kind="ride",
-                        minutes=minutes,
-                        line=line,
-                    )
+                    for source, target in ((station, neighbor), (neighbor, station)):
+                        graph.add_edge(
+                            (source, line),
+                            (target, line),
+                            weight=minutes,
+                            kind="ride",
+                            minutes=minutes,
+                            line=line,
+                        )
 
         # Transfer edges are added only inside the same interchange station.
         transfer_minutes = float(self.schedule["transfer_minutes"])
