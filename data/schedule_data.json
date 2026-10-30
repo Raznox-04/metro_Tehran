@@ -1,0 +1,37 @@
+{
+  "source": "Estimated model based on station coordinates and configurable assumptions; not an official Tehran Metro timetable.",
+  "last_updated": "2026-10-30",
+  "service_hours": {
+    "opens": "05:30",
+    "closes": "23:00"
+  },
+  "peak_periods": [
+    {"start": "07:00", "end": "09:00"},
+    {"start": "16:00", "end": "19:00"}
+  ],
+  "headways_minutes": {
+    "1": {"weekday": {"peak": 6, "off_peak": 8}, "weekend": {"peak": 8, "off_peak": 10}},
+    "2": {"weekday": {"peak": 6, "off_peak": 8}, "weekend": {"peak": 8, "off_peak": 10}},
+    "3": {"weekday": {"peak": 7, "off_peak": 9}, "weekend": {"peak": 9, "off_peak": 11}},
+    "4": {"weekday": {"peak": 6, "off_peak": 8}, "weekend": {"peak": 8, "off_peak": 10}},
+    "5": {"weekday": {"peak": 10, "off_peak": 15}, "weekend": {"peak": 12, "off_peak": 18}},
+    "6": {"weekday": {"peak": 8, "off_peak": 10}, "weekend": {"peak": 10, "off_peak": 12}},
+    "7": {"weekday": {"peak": 8, "off_peak": 10}, "weekend": {"peak": 10, "off_peak": 12}}
+  },
+  "default_headway_minutes": {
+    "weekday": {"peak": 8, "off_peak": 10},
+    "weekend": {"peak": 10, "off_peak": 12}
+  },
+  "average_speed_kmh": 35,
+  "distance_detour_factor": 1.25,
+  "dwell_allowance_minutes": 0.5,
+  "minimum_segment_minutes": 1.2,
+  "fallback_segment_minutes": 3.0,
+  "transfer_minutes": 5,
+  "assumptions": [
+    "زمان حرکت بین ایستگاه‌ها با فاصله مستقیم جغرافیایی، ضریب اصلاح مسیر و سرعت متوسط تخمین زده می‌شود.",
+    "زمان انتظار برابر نصف فاصله زمانی تخمینی حرکت قطارها در نظر گرفته شده است.",
+    "برای هر تعویض خط، ۵ دقیقه زمان پیاده‌روی و جابه‌جایی به زمان سفر اضافه می‌شود.",
+    "ساعت کاری و فاصله حرکت قطارها پارامترهای قابل تنظیم و تخمینی هستند؛ جدول رسمی حرکت قطارها در دسترس نیست."
+  ]
+}
