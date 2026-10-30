@@ -4,6 +4,14 @@
   const colors={1:"#e0001f",2:"#2f4389",3:"#67c5f5",4:"#f2df00",5:"#07884d",6:"#ef639f",7:"#7f0b74"};
   const lineNames={1:"خط ۱",2:"خط ۲",3:"خط ۳",4:"خط ۴",5:"خط ۵",6:"خط ۶",7:"خط ۷"};
   let routes={fastest:null,shortest:null},active="fastest";
+  // Default departure time follows the current clock in Tehran, regardless of device timezone.
+  const departureInput=$("departure-time");
+  if(departureInput){
+    const tehranTime=new Intl.DateTimeFormat("en-GB",{
+      timeZone:"Asia/Tehran",hour:"2-digit",minute:"2-digit",hourCycle:"h23"
+    }).format(new Date());
+    departureInput.value=tehranTime;
+  }
   const esc=(v)=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const lineName=n=>lineNames[n]||("خط "+n);
   const formatMinutes=value=>{const n=Math.max(0,Math.round(Number(value)||0)),h=Math.floor(n/60),m=n%60;return h?(m?h+" ساعت و "+m+" دقیقه":h+" ساعت"):m+" دقیقه";};
