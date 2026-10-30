@@ -135,3 +135,16 @@ body{overflow-x:hidden}
   .transfer-note{margin-inline-start:0;font-size:9px}
   .footer-copy,.footer-author{justify-content:flex-start;text-align:right}
 }
+
+/* Small spacing adjustment only — preserve the existing layout */
+@media(max-width:760px){
+  .station-inputs{column-gap:12px;row-gap:12px}
+  .travel-options{column-gap:14px;row-gap:12px}
+  #route-form{gap:22px}
+  .swap-btn{margin-inline:2px}
+  .submit-btn{margin-top:2px}
+}
+@media(max-width:420px){
+  .travel-options{row-gap:13px}
+  #route-form{gap:20px}
+}
