@@ -12,7 +12,8 @@
   function showError(msg){errorBox.textContent=msg;errorBox.hidden=false;resultsContent.hidden=true;results.hidden=false;}
   function renderLegend(target,lines){target.innerHTML=lines.map(n=>'<div class="legend-item"><i class="line-swatch" style="background:'+colors[n]+'"></i>'+lineName(n)+'</div>').join("");}
   function coords(){const valid=state.stations.filter(s=>Number.isFinite(s.x)&&Number.isFinite(s.y));const xs=valid.map(s=>s.x),ys=valid.map(s=>s.y);return {valid,minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys)};}
-  function edgeLines(a,b){const common=(a.lines||[]).filter(n=>(b.lines||[]).includes(n));return common.length?common:[(a.lines||[])[0]||(b.lines||[])[0]||1];}
+  // اتصال فقط با خط مشترک دو ایستگاه رسم می‌شود؛ رنگ خط نامرتبط حدس زده نمی‌شود.
+  function edgeLines(a,b){return [...new Set((a.lines||[]).filter(n=>(b.lines||[]).includes(n)))];}
   function renderMap(route=[]){
     const {valid,minX,maxX,minY,maxY}=coords();if(!valid.length)return;
     const W=1400,H=1000,pad=75,dx=maxX-minX||1,dy=maxY-minY||1;
@@ -25,17 +26,23 @@
     valid.forEach(a=>(a.relations||[]).forEach(id=>{
       const b=state.byName.get(id);if(!b)return;const key=[a.id,b.id].sort().join("|");if(seen.has(key))return;seen.add(key);
       const A=pos(a),B=pos(b),isRoute=routeEdges.has([a.name,b.name].sort().join("|"));
-      edgeLines(a,b).forEach(line=>{
-        edges+='<path class="network-edge-under" d="M '+A.x+' '+A.y+' L '+B.x+' '+B.y+'"/>';
-        edges+='<path class="network-edge '+(isRoute?'route-edge':'')+'" d="M '+A.x+' '+A.y+' L '+B.x+' '+B.y+'" stroke="'+(isRoute?colors[line]:colors[line])+'" stroke-width="'+(isRoute?8:5)+'" opacity="'+(route.length&&!isRoute?.22:.88)+'"/>';
+      const sharedLines=edgeLines(a,b);
+      sharedLines.forEach((line,lineIndex)=>{
+        const offset=sharedLines.length>1?(lineIndex===0?-2.5:2.5):0;
+        const dx=B.x-A.x,dy=B.y-A.y,len=Math.hypot(dx,dy)||1;
+        const ox=(-dy/len)*offset,oy=(dx/len)*offset;
+        const path='M '+(A.x+ox)+' '+(A.y+oy)+' L '+(B.x+ox)+' '+(B.y+oy);
+        edges+='<path class="network-edge-under" d="'+path+'"/>';
+        edges+='<path class="network-edge '+(isRoute?'route-edge':'')+'" d="'+path+'" stroke="'+colors[line]+'" stroke-width="'+(isRoute?8:5)+'" opacity="'+(route.length&&!isRoute?.14:.88)+'"/>';
       });
     }));
     valid.forEach(s=>{
       const p=pos(s),isTransfer=(s.lines||[]).length>1,isRoute=routeSet.has(s.name),isEndpoint=route.length&&(s.name===route[0]||s.name===route[route.length-1]);
-      const dots=(s.lines||[]).slice(0,3).map((line,i)=>'<circle cx="'+(p.x+(i-(Math.min(s.lines.length,3)-1)/2)*5)+'" cy="'+p.y+'" r="2.6" fill="'+colors[line]+'"/>').join("");
+      // ایستگاه تقاطعی یک نشان واحد دارد؛ چند رنگ داخل نقطه تکرار نمی‌شود.
+      const transferGlyph=isTransfer?'<text class="transfer-mark" x="'+p.x+'" y="'+(p.y+2.7)+'" text-anchor="middle">↔</text>':'';
       const anchor=p.x>W*.82?"end":p.x<W*.18?"start":"middle";
-      const labelY=p.y>H*.82?-13:19;
-      nodes+='<g class="station-node '+(isTransfer?'transfer-node ':'')+(isRoute?'route-node ':'')+(isEndpoint?'selected':'')+'" tabindex="0" role="button" data-station="'+esc(s.fa)+'"><title>'+esc(s.fa)+' · '+(s.lines||[]).map(lineName).join("، ")+'</title><circle class="node-core" cx="'+p.x+'" cy="'+p.y+'" r="'+(isEndpoint?9:isTransfer?8:5.8)+'"/>'+dots+'<text x="'+(p.x+(anchor==="start"?12:anchor==="end"?-12:0))+'" y="'+(p.y+labelY)+'" text-anchor="'+anchor+'">'+esc(s.fa)+'</text></g>';
+      const labelY=p.y>H*.82?-14:19;
+      nodes+='<g class="station-node '+(isTransfer?'transfer-node ':'')+(isRoute?'route-node ':'')+(isEndpoint?'selected':'')+'" tabindex="0" role="button" data-station="'+esc(s.fa)+'"><title>'+esc(s.fa)+' · '+(s.lines||[]).map(lineName).join("، ")+(isTransfer?' · ایستگاه تقاطعی':'')+'</title><circle class="node-core" cx="'+p.x+'" cy="'+p.y+'" r="'+(isEndpoint?9:isTransfer?9:5.8)+'"/>'+transferGlyph+'<text x="'+(p.x+(anchor==="start"?12:anchor==="end"?-12:0))+'" y="'+(p.y+labelY)+'" text-anchor="'+anchor+'">'+esc(s.fa)+'</text></g>';
     });
     const svg='<svg id="network-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="نقشه تعاملی خطوط مترو تهران">'+edges+nodes+'</svg>';
     $("#metro-map").innerHTML=svg;
