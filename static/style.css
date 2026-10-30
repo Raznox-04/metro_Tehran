@@ -8,3 +8,30 @@
 @media(min-width:1500px){.workspace{grid-template-columns:390px minmax(0,1fr);gap:22px;padding:22px}.sidebar{padding:25px}.map-panel{min-height:calc(100vh - 120px)}}
 @media(max-width:900px){.workspace{grid-template-columns:1fr;padding:12px}.sidebar{order:1}.map-panel{order:2;min-height:520px}.map-viewport,.metro-map,.metro-map svg{min-height:500px}.map-toolbar{padding:14px}.topbar{height:65px}}
 @media(max-width:560px){.topbar{padding:0 14px}.topbar-meta{font-size:9px}.workspace{padding:9px;gap:10px}.sidebar{padding:16px;border-radius:14px}.panel-heading{margin-bottom:15px}.panel-heading h1{font-size:19px}.map-panel{border-radius:14px;min-height:430px}.map-viewport,.metro-map,.metro-map svg{min-height:420px}.map-toolbar{align-items:flex-start;flex-direction:column}.map-tools{align-self:stretch}.map-tools button:last-child{margin-right:auto}.map-footer{align-items:flex-start;flex-direction:column}.journey-overview{grid-template-columns:1fr 1fr}.route-timeline{max-height:280px}}
+
+
+/* خوانایی نقشه و نمایش واحد ایستگاه‌های تقاطعی */
+.station-node.transfer-node circle.node-core{fill:#fff;stroke:#263750;stroke-width:3.2}
+.station-node.transfer-node .transfer-mark{font-family:Arial,sans-serif;font-size:8px;font-weight:800;fill:#263750;stroke:none}
+.station-node.route-node circle.node-core{fill:#fff;stroke:#172b46;stroke-width:3.5}
+.station-node.selected circle.node-core{fill:#fff8dc;stroke:#172b46;stroke-width:4.5}
+.network-edge{transition:opacity .18s,stroke-width .18s}
+.map-legend{align-items:center}
+.map-legend:after{content:"◎ ایستگاه تقاطعی";font-size:10px;color:#718096;display:inline-flex;align-items:center;margin-inline-start:5px}
+.map-viewport{overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#cbd3df transparent}
+@media(max-width:900px){
+  .map-viewport{overflow:auto}
+  .metro-map{width:1120px;height:800px;min-height:800px;justify-content:flex-start}
+  .metro-map svg{width:1120px;height:800px;min-height:800px;max-height:none;max-width:none}
+  .map-toolbar small{max-width:70vw;line-height:1.8}
+}
+@media(max-width:560px){
+  .workspace{padding:8px}
+  .sidebar{padding:14px}
+  .map-panel{min-height:420px}
+  .map-viewport{min-height:440px}
+  .metro-map{width:1050px;height:750px;min-height:750px}
+  .metro-map svg{width:1050px;height:750px;min-height:750px}
+  .map-tools button{min-height:36px}
+  .station-node text{font-size:11px}
+}
