@@ -1,442 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="مسیریاب متروی تهران - پیدا کردن بهترین مسیر بین ایستگاه‌های مترو">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="مسیریاب هوشمند متروی تهران">
   <title>مسیریاب متروی تهران</title>
-  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <img src="https://noza.ir/Alefbasystem/images/clients/11.png" alt="لوگوی متروی تهران" class="logo">
-      <h1>مسیریاب متروی تهران</h1>
-    </div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="صفحه اصلی">
+      <span class="brand-mark">M</span>
+      <span><strong>مترویار</strong><small>مسیریاب متروی تهران</small></span>
+    </a>
+    <div class="topbar-meta"><span class="status-dot"></span> نقشه شبکه مترو تهران <span class="meta-divider"></span> ۷ خط فعال در داده‌ها</div>
+  </header>
 
-    <div class="app-description">
-      بهترین و کوتاه‌ترین مسیر بین ایستگاه‌های متروی تهران
-    </div>
-
-    <div class="form-section">
-      <form id="route-form">
-        <div class="form-group">
-          <label for="from">ایستگاه مبدا:</label>
-          <input type="text" id="from" placeholder="نام ایستگاه مبدا" required autocomplete="off">
-        </div>
-
-        <div class="form-group">
-          <label for="to">ایستگاه مقصد:</label>
-          <input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off">
-        </div>
-
-        <div class="form-group journey-options">
-          <label for="departure-time">ساعت حرکت:</label>
-          <input type="time" id="departure-time" value="08:30">
-        </div>
-        <div class="form-group journey-options">
-          <label for="day-type">نوع روز:</label>
-          <select id="day-type">
-            <option value="weekday">روز کاری</option>
-            <option value="weekend">روز تعطیل</option>
-          </select>
-        </div>
-
-        <button type="submit" id="submit-btn">پیدا کردن مسیر</button>
-      </form>
-    </div>
-
-    <div id="result" class="result"></div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('route-form');
-      const resultDiv = document.getElementById('result');
-      const submitBtn = document.getElementById('submit-btn');
-      const fromInput = document.getElementById('from');
-      const toInput = document.getElementById('to');
-
-      // ایجاد لیست پیشنهاد برای ورودی‌ها
-      function setupAutocomplete(input) {
-        let currentFocus;
-
-        input.addEventListener("input", function() {
-          const val = this.value;
-          closeAllLists();
-          if (!val || val.length < 2) return false;
-
-          currentFocus = -1;
-
-          fetch(`/api/stations/search?query=${encodeURIComponent(val)}`)
-            .then(res => {
-              if (!res.ok) throw new Error('خطا در جستجو');
-              return res.json();
-            })
-            .then(data => {
-              const list = document.createElement("div");
-              list.setAttribute("id", this.id + "-autocomplete-list");
-              list.setAttribute("class", "autocomplete-items");
-              this.parentNode.appendChild(list);
-
-              if (data.stations && data.stations.length > 0) {
-                data.stations.forEach(station => {
-                  const item = document.createElement("div");
-                  item.innerHTML = station;
-                  item.innerHTML += "<input type='hidden' value='" + station + "'>";
-                  item.addEventListener("click", function() {
-                    input.value = this.getElementsByTagName("input")[0].value;
-                    closeAllLists();
-                  });
-                  list.appendChild(item);
-                });
-              } else {
-                const item = document.createElement("div");
-                item.innerHTML = "ایستگاهی یافت نشد";
-                item.style.color = "#5a6783";
-                item.style.cursor = "default";
-                list.appendChild(item);
-              }
-            })
-            .catch(err => {
-              console.error('Error in autocomplete:', err);
-              fallbackAutocomplete(input, val);
-            });
-        });
-
-        // Fallback function if API fails
-        function fallbackAutocomplete(input, val) {
-          const commonStations = [
-            "تجریش", "قیطریه", "شهید صدر", "قلهک", "میرداماد", "شهید همت",
-            "شریعتی", "دروازه شمیران", "پانزده خرداد", "خیام", "میدان محمدیه",
-            "شوش", "پایانه جنوب", "بیمه", "دکتر حبیب‌الله", "میدان حر",
-            "توحید", "میدان صنعت", "یادگار امام", "شهرک غرب", "ایوانک",
-            "امام خمینی", "میدان انقلاب", "میدان آزادی", "شهید حقانی",
-            "تهرانپارس", "فردوسی", "طالقانی", "شهید باهنر", "دروازه دولت",
-            "کهریزک", "صادقیه", "فرهنگسرا", "قائم", "آزادگان", "شهید کلاهدوز",
-            "علامه جعفری", "شهید سلیمانی", "شهدای دولت‌آباد", "کوهسار", "بسیج",
-            "میدان کتاب", "شهید بهشتی", "میدان جهاد"
-          ];
-
-          const list = document.createElement("div");
-          list.setAttribute("id", input.id + "-autocomplete-list");
-          list.setAttribute("class", "autocomplete-items");
-          input.parentNode.appendChild(list);
-
-          const matches = commonStations.filter(station =>
-            station.toLowerCase().includes(val.toLowerCase())
-          );
-
-          if (matches.length > 0) {
-            matches.forEach(station => {
-              const item = document.createElement("div");
-                  item.innerHTML = station;
-                  item.innerHTML += "<input type='hidden' value='" + station + "'>";
-                  item.addEventListener("click", function() {
-                    input.value = this.getElementsByTagName("input")[0].value;
-                    closeAllLists();
-                  });
-                  list.appendChild(item);
-                });
-              } else {
-                const item = document.createElement("div");
-                item.innerHTML = "ایستگاهی یافت نشد";
-                item.style.color = "#5a6783";
-                item.style.cursor = "default";
-                list.appendChild(item);
-              }
-            }
-
-        input.addEventListener("keydown", function(e) {
-          let items = document.getElementById(this.id + "-autocomplete-list");
-          if (items) items = items.getElementsByTagName("div");
-
-          if (e.keyCode == 40) {
-            currentFocus++;
-            addActive(items);
-          } else if (e.keyCode == 38) { // فلش بالا
-            currentFocus--;
-            addActive(items);
-          } else if (e.keyCode == 13) { // اینتر
-            e.preventDefault();
-            if (currentFocus > -1 && items) {
-              items[currentFocus].click();
-            }
-          }
-        });
-
-        function addActive(items) {
-          if (!items) return false;
-          removeActive(items);
-          if (currentFocus >= items.length) currentFocus = 0;
-          if (currentFocus < 0) currentFocus = items.length - 1;
-          items[currentFocus].classList.add("autocomplete-active");
-        }
-
-        function removeActive(items) {
-          for (let i = 0; i < items.length; i++) {
-            items[i].classList.remove("autocomplete-active");
-          }
-        }
-
-        function closeAllLists(elmnt) {
-          const items = document.getElementsByClassName("autocomplete-items");
-          for (let i = 0; i < items.length; i++) {
-            if (elmnt != items[i] && elmnt != input) {
-              items[i].parentNode.removeChild(items[i]);
-            }
-          }
-        }
-
-        document.addEventListener("click", function(e) {
-          closeAllLists(e.target);
-        });
-      }
-
-      // راه‌اندازی autocomplete برای هر دو فیلد
-      setupAutocomplete(fromInput);
-      setupAutocomplete(toInput);
-
-      // مدیریت ارسال فرم
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const from = fromInput.value.trim();
-        const to = toInput.value.trim();
-
-        if (!from || !to) {
-          showError('لطفاً هر دو ایستگاه را وارد کنید');
-          return;
-        }
-
-        if (from === to) {
-          showError('ایستگاه مبدا و مقصد نمی‌توانند یکسان باشند');
-          return;
-        }
-
-        setLoadingState(true);
-
-        try {
-          const departureTime = document.getElementById('departure-time').value || '12:00';
-          const dayType = document.getElementById('day-type').value;
-          const query = `from_station=${encodeURIComponent(from)}&to_station=${encodeURIComponent(to)}`;
-          const [shortestResponse, fastestResponse] = await Promise.all([
-            fetch(`/api/route/details?${query}`),
-            fetch(`/api/route/fastest?${query}&departure_time=${encodeURIComponent(departureTime)}&day_type=${encodeURIComponent(dayType)}`)
-          ]);
-          const shortestData = await shortestResponse.json();
-          const fastestData = await fastestResponse.json();
-
-          if (!shortestResponse.ok) throw new Error(shortestData.detail || 'خطا در دریافت کوتاه‌ترین مسیر');
-          if (!fastestResponse.ok) throw new Error(fastestData.detail || 'خطا در محاسبه زمان سفر');
-
-          window.currentFastestRoute = fastestData;
-          window.currentShortestRoute = shortestData;
-          showRoute(fastestData, shortestData);
-
-        } catch (err) {
-          console.error('خطا در ارتباط با سرور:', err);
-          showError(err.message || 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
-        } finally {
-          setLoadingState(false);
-        }
-      });
-
-      function setLoadingState(isLoading) {
-        if (isLoading) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = 'در حال جستجو <span class="loading"></span>';
-        } else {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'پیدا کردن مسیر';
-        }
-      }
-
-      function showError(message) {
-        resultDiv.innerHTML = `<div class="error">${message}</div>`;
-      }
-
-      function showRoute(data, shortestData) {
-        const { route, route_details, stops, total_stations } = data;
-        const estimate = data.estimated_time || {};
-        const shortestRoute = shortestData.route || [];
-        const routeSummary = `
-          <div class="journey-meta">
-            <div class="journey-meta-title">مقایسه مسیرها</div>
-            <div class="journey-meta-actions">
-              <button type="button" class="journey-choice active" id="fastest-choice">سریع‌ترین مسیر · ${Math.round(estimate.total_minutes || 0)} دقیقه</button>
-              <button type="button" class="journey-choice" id="shortest-choice">کوتاه‌ترین مسیر · ${shortestData.stops ?? Math.max(0, shortestRoute.length - 1)} ایستگاه</button>
-            </div>
-            <div class="journey-meta-details">
-              <span>حرکت قطار: <b>${Math.round(estimate.travel_minutes || 0)} دقیقه</b></span>
-              <span>انتظار: <b>${Math.round(estimate.waiting_minutes || 0)} دقیقه</b></span>
-              <span>تعویض خط: <b>${Math.round(estimate.transfer_minutes || 0)} دقیقه</b></span>
-              <span>زمان رسیدن تخمینی: <b>${data.arrival_time || '—'}</b></span>
-            </div>
-            <small>این زمان‌ها تخمینی‌اند و بر اساس زمان‌بندی زنده قطارها محاسبه نشده‌اند.</small>
-          </div>`;
-
-
-        let routeHTML = routeSummary + `
-          <div class="route-info">
-            <div class="route-summary">
-              <div class="summary-item">
-                <span class="summary-value">${total_stations}</span>
-                <span class="summary-label">ایستگاه</span>
-              </div>
-            </div>
-          </div>ب
-        `;
-
-        // گروه‌بندی مسیر بر اساس خطوط
-        const routeGroups = groupRouteByLines(route_details);
-
-        routeHTML += `<div class="route-sections">`;
-
-        routeGroups.forEach((group) => {
-          const lineNumber = group.lines[0];
-          const lineName = getLineName(lineNumber);
-          const lineColor = getLineColor(lineNumber);
-
-          routeHTML += `
-            <div class="route-section">
-              <div class="line-header" style="background-color: ${lineColor}">
-                <span>${lineName}</span>
-              </div>
-              <ul class="station-list">
-          `;
-
-          group.stations.forEach((station, stationIndex) => {
-            const lineBadges = station.lines.map(line =>
-              `<span class="line-badge line-${line}">${getLineName(line)}</span>`
-            ).join('');
-
-            routeHTML += `
-              <li>
-                <div class="station-info">
-                  ${lineBadges}
-                  <span>${station.name}</span>
-                </div>
-                <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">${stationIndex + 1}</span>
-              </li>
-            `;
-          });
-
-          routeHTML += `
-              </ul>
-            </div>
-          `;
-        });
-
-        routeHTML += `</div>`;
-        resultDiv.innerHTML = routeHTML;
-        document.getElementById('fastest-choice').addEventListener('click', () => showRoute(window.currentFastestRoute, window.currentShortestRoute));
-        document.getElementById('shortest-choice').addEventListener('click', () => showShortestRoute(window.currentShortestRoute));
-      }
-
-      function showShortestRoute(data) {
-        const { route, route_details, total_stations } = data;
-        let routeHTML = `
-          <div class="journey-meta">
-            <div class="journey-meta-title">کوتاه‌ترین مسیر بر اساس تعداد ایستگاه</div>
-            <div class="journey-meta-actions">
-              <button type="button" class="journey-choice" id="fastest-choice">نمایش سریع‌ترین مسیر</button>
-              <button type="button" class="journey-choice active">کوتاه‌ترین مسیر · ${Math.max(0, route.length - 1)} ایستگاه</button>
-            </div>
-            <div class="journey-meta-details"><span>تعداد ایستگاه‌ها: <b>${total_stations}</b></span><span>تعویض خط: <b>${data.transfer_count || 0}</b></span></div>
+  <main class="workspace">
+    <aside class="sidebar">
+      <div class="panel-heading">
+        <div><span class="eyebrow">PLAN YOUR TRIP</span><h1>کجا می‌خوای بری؟</h1></div>
+        <span class="heading-icon">⌁</span>
+      </div>
+      <form id="route-form" class="search-form">
+        <div class="station-fields">
+          <div class="station-field">
+            <span class="field-marker origin-marker"></span>
+            <label for="from">مبدأ</label>
+            <div class="input-wrap"><input id="from" type="text" placeholder="مثلاً تجریش" autocomplete="off" required><div id="from-suggestions" class="suggestions"></div></div>
           </div>
-          <div class="route-info"><div class="route-summary"><div class="summary-item"><span class="summary-value">${total_stations}</span><span class="summary-label">ایستگاه</span></div></div></div>
-        `;
-        const routeGroups = groupRouteByLines(route_details);
-        routeHTML += '<div class="route-sections">';
-        routeGroups.forEach((group) => {
-          const lineNumber = group.lines[0];
-          routeHTML += `<div class="route-section"><div class="line-header" style="background-color: ${getLineColor(lineNumber)}"><span>${getLineName(lineNumber)}</span></div><ul class="station-list">`;
-          group.stations.forEach((station, stationIndex) => {
-            const badges = station.lines.map(line => `<span class="line-badge line-${line}">${getLineName(line)}</span>`).join('');
-            routeHTML += `<li><div class="station-info">${badges}<span>${station.name}</span></div><span style="color:var(--text-secondary);font-size:.95rem;font-weight:600">${stationIndex + 1}</span></li>`;
-          });
-          routeHTML += '</ul></div>';
-        });
-        routeHTML += '</div>';
-        resultDiv.innerHTML = routeHTML;
-        document.getElementById('fastest-choice').addEventListener('click', () => showRoute(window.currentFastestRoute, window.currentShortestRoute));
-      }
+          <button type="button" id="swap-stations" class="swap-button" aria-label="جابه‌جایی مبدأ و مقصد" title="جابه‌جایی">↕</button>
+          <div class="station-field">
+            <span class="field-marker destination-marker"></span>
+            <label for="to">مقصد</label>
+            <div class="input-wrap"><input id="to" type="text" placeholder="مثلاً میدان صنعت" autocomplete="off" required><div id="to-suggestions" class="suggestions"></div></div>
+          </div>
+        </div>
+        <div class="form-divider"></div>
+        <div class="options-row">
+          <label class="option-field"><span>ساعت حرکت</span><input id="departure-time" type="time" value="08:30"></label>
+          <label class="option-field"><span>روز حرکت</span><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></label>
+        </div>
+        <button type="submit" id="search-button" class="primary-button"><span>پیدا کردن مسیر</span><b>←</b></button>
+        <button type="button" id="reset-search" class="reset-button">پاک کردن انتخاب‌ها</button>
+      </form>
 
-      // توابع کمکی
-      function groupRouteByLines(routeDetails) {
-        const groups = [];
-        let currentGroup = {
-          lines: routeDetails[0]?.lines || [1],
-          stations: []
-        };
+      <section id="results-section" class="results-section" hidden>
+        <div id="error-message" class="error-message" hidden></div>
+        <div id="results-content" hidden>
+          <div class="result-tabs" role="tablist" aria-label="نوع مسیر">
+            <button type="button" class="route-tab active" data-route="fastest" role="tab" aria-selected="true">سریع‌ترین</button>
+            <button type="button" class="route-tab" data-route="shortest" role="tab" aria-selected="false">کوتاه‌ترین</button>
+          </div>
+          <div id="journey-overview" class="journey-overview"></div>
+          <div class="route-caption">مراحل سفر</div>
+          <div id="route-timeline" class="route-timeline"></div>
+          <div id="line-legend-items" class="route-legend"></div>
+          <p class="estimate-note">زمان سفر تخمینی است و بر اساس موقعیت زنده قطارها محاسبه نمی‌شود.</p>
+        </div>
+      </section>
+      <div class="sidebar-foot"><span class="info-icon">i</span><span>برای انتخاب سریع‌تر، می‌تونی روی ایستگاه‌های نقشه هم بزنی و مبدأ یا مقصد رو مشخص کنی.</span></div>
+    </aside>
 
-        routeDetails.forEach((station, index) => {
-          if (!arraysEqual(currentGroup.lines, station.lines)) {
-            groups.push(currentGroup);
-            currentGroup = {
-              lines: station.lines,
-              stations: []
-            };
-          }
-
-          currentGroup.stations.push(station);
-
-          if (index === routeDetails.length - 1) {
-            groups.push(currentGroup);
-          }
-        });
-
-        return groups;
-      }
-
-      function arraysEqual(arr1, arr2) {
-        if (arr1.length !== arr2.length) return false;
-        return arr1.every((value, index) => value === arr2[index]);
-      }
-
-      function getLineName(lineNumber) {
-        const lineNames = {
-          1: "خط ۱",
-          2: "خط ۲",
-          3: "خط ۳",
-          4: "خط ۴",
-          5: "خط ۵",
-          6: "خط ۶",
-          7: "خط ۷"
-        };
-        return lineNames[lineNumber] || `خط ${lineNumber}`;
-      }
-
-      function getLineColor(lineNumber) {
-        const lineColors = {
-          1: "#E0001F",
-          2: "#2F4389",
-          3: "#67C5F5",
-          4: "#F8E100",
-          5: "#007E46",
-          6: "#EF639F",
-          7: "#7F0B74"
-        };
-        return lineColors[lineNumber] || "#E0001F";
-      }
-      fromInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && !e.shiftKey) {
-          e.preventDefault();
-          toInput.focus();
-        }
-      });
-
-      toInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && e.shiftKey) {
-          e.preventDefault();
-          fromInput.focus();
-        }
-      });
-    });
-  </script>
+    <section class="map-panel" aria-label="نقشه خطوط مترو تهران">
+      <div class="map-toolbar">
+        <div><strong>نقشه خطوط مترو</strong><small id="map-hint">برای دیدن نام ایستگاه، روی نشانگر برو یا لمس کن.</small></div>
+        <div class="map-tools"><button id="zoom-out" type="button" aria-label="کوچک‌نمایی">−</button><button id="zoom-in" type="button" aria-label="بزرگ‌نمایی">+</button><button id="zoom-fit" type="button">نمای کامل</button></div>
+      </div>
+      <div class="map-viewport" id="map-viewport">
+        <div id="metro-map" class="metro-map"><div class="map-loading">در حال بارگذاری نقشه ایستگاه‌ها…</div></div>
+      </div>
+      <div class="map-footer"><div id="map-legend" class="map-legend"></div><span class="map-source">جایگاه ایستگاه‌ها بر اساس مختصات ثبت‌شده در داده‌های پروژه</span></div>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
 </body>
 </html>
