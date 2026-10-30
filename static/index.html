@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f7fb">
-  <meta name="description" content="مسیریاب هوشمند متروی تهران">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c1424">
+  <meta name="description" content="مسیریاب متروی تهران؛ پیدا کردن کوتاه‌ترین و سریع‌ترین مسیر">
   <title>مسیریاب متروی تهران</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,70 +12,42 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="/" aria-label="صفحه اصلی">
-      <span class="brand-mark">M</span>
-      <span><strong>مترویار</strong><small>مسیریاب متروی تهران</small></span>
-    </a>
-    <div class="topbar-meta"><span class="status-dot"></span> نقشه شبکه مترو تهران <span class="meta-divider"></span> ۷ خط فعال در داده‌ها</div>
-  </header>
+  <main class="container">
+    <header class="header">
+      <img src="https://noza.ir/Alefbasystem/images/clients/11.png" alt="لوگوی متروی تهران" class="logo">
+      <div class="header-copy"><span class="eyebrow">TEHRAN METRO</span><h1>مسیریاب متروی تهران</h1><p>مسیرت رو ساده‌تر پیدا کن</p></div>
+    </header>
 
-  <main class="workspace">
-    <aside class="sidebar">
-      <div class="panel-heading">
-        <div><span class="eyebrow">PLAN YOUR TRIP</span><h1>کجا می‌خوای بری؟</h1></div>
-        <span class="heading-icon">⌁</span>
-      </div>
-      <form id="route-form" class="search-form">
-        <div class="station-fields">
-          <div class="station-field">
-            <span class="field-marker origin-marker"></span>
-            <label for="from">مبدأ</label>
-            <div class="input-wrap"><input id="from" type="text" placeholder="مثلاً تجریش" autocomplete="off" required><div id="from-suggestions" class="suggestions"></div></div>
-          </div>
-          <button type="button" id="swap-stations" class="swap-button" aria-label="جابه‌جایی مبدأ و مقصد" title="جابه‌جایی">↕</button>
-          <div class="station-field">
-            <span class="field-marker destination-marker"></span>
-            <label for="to">مقصد</label>
-            <div class="input-wrap"><input id="to" type="text" placeholder="مثلاً میدان صنعت" autocomplete="off" required><div id="to-suggestions" class="suggestions"></div></div>
-          </div>
-        </div>
-        <div class="form-divider"></div>
-        <div class="options-row">
-          <label class="option-field"><span>ساعت حرکت</span><input id="departure-time" type="time" value="08:30"></label>
-          <label class="option-field"><span>روز حرکت</span><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></label>
-        </div>
-        <button type="submit" id="search-button" class="primary-button"><span>پیدا کردن مسیر</span><b>←</b></button>
-        <button type="button" id="reset-search" class="reset-button">پاک کردن انتخاب‌ها</button>
-      </form>
-
-      <section id="results-section" class="results-section" hidden>
-        <div id="error-message" class="error-message" hidden></div>
-        <div id="results-content" hidden>
-          <div class="result-tabs" role="tablist" aria-label="نوع مسیر">
-            <button type="button" class="route-tab active" data-route="fastest" role="tab" aria-selected="true">سریع‌ترین</button>
-            <button type="button" class="route-tab" data-route="shortest" role="tab" aria-selected="false">کوتاه‌ترین</button>
-          </div>
-          <div id="journey-overview" class="journey-overview"></div>
-          <div class="route-caption">مراحل سفر</div>
-          <div id="route-timeline" class="route-timeline"></div>
-          <div id="line-legend-items" class="route-legend"></div>
-          <p class="estimate-note">زمان سفر تخمینی است و بر اساس موقعیت زنده قطارها محاسبه نمی‌شود.</p>
-        </div>
-      </section>
-      <div class="sidebar-foot"><span class="info-icon">i</span><span>برای انتخاب سریع‌تر، می‌تونی روی ایستگاه‌های نقشه هم بزنی و مبدأ یا مقصد رو مشخص کنی.</span></div>
-    </aside>
-
-    <section class="map-panel" aria-label="نقشه خطوط مترو تهران">
-      <div class="map-toolbar">
-        <div><strong>نقشه خطوط مترو</strong><small id="map-hint">برای انتخاب مبدأ یا مقصد، ایستگاه را لمس کن. ایستگاه‌های تقاطعی با نشان ↔ مشخص شده‌اند.</small></div>
-        <div class="map-tools"><button id="zoom-out" type="button" aria-label="کوچک‌نمایی">−</button><button id="zoom-in" type="button" aria-label="بزرگ‌نمایی">+</button><button id="zoom-fit" type="button">نمای کامل</button></div>
-      </div>
-      <div class="map-viewport" id="map-viewport">
-        <div id="metro-map" class="metro-map"><div class="map-loading">در حال بارگذاری نقشه ایستگاه‌ها…</div></div>
-      </div>
-      <div class="map-footer"><div id="map-legend" class="map-legend"></div><span class="map-source">رنگ هر اتصال از خط مشترک دو ایستگاه تعیین می‌شود؛ نشان ↔ یعنی امکان تعویض خط</span></div>
+    <section class="intro">
+      <span class="intro-mark">●</span>
+      <span>مبدأ و مقصدت رو انتخاب کن تا بهترین مسیر رو پیدا کنیم.</span>
     </section>
+
+    <section class="form-section">
+      <form id="route-form" autocomplete="off">
+        <div class="station-inputs">
+          <div class="form-group">
+            <label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label>
+            <div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div>
+          </div>
+          <button type="button" id="swap-btn" class="swap-btn" title="جابه‌جایی مبدأ و مقصد" aria-label="جابه‌جایی مبدأ و مقصد">↕</button>
+          <div class="form-group">
+            <label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label>
+            <div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div>
+          </div>
+        </div>
+
+        <div class="travel-options">
+          <div class="form-group compact"><label for="departure-time">ساعت حرکت</label><input type="time" id="departure-time" value="08:30"></div>
+          <div class="form-group compact"><label for="day-type">روز حرکت</label><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></div>
+        </div>
+        <button type="submit" id="submit-btn" class="submit-btn"><span>پیدا کردن مسیر</span><span class="button-arrow">←</span></button>
+      </form>
+      <p class="form-hint">برای انتخاب دقیق‌تر، نام ایستگاه رو تایپ کن و از فهرست پیشنهادها انتخابش کن.</p>
+    </section>
+
+    <section id="result" class="result" aria-live="polite"></section>
+    <footer class="footer"><span>مسیریاب متروی تهران</span><span>زمان سفرها تخمینی است و اطلاعات زنده قطارها نیست.</span></footer>
   </main>
   <script src="/app.js" defer></script>
 </body>
