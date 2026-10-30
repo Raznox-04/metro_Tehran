@@ -157,49 +157,26 @@ body{overflow-x:hidden}
   .travel-options{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px;row-gap:12px}
 }
 
-/* iPhone Safari: avoid native time/select controls colliding in a two-column grid */
+/* iPhone Safari compatibility without changing the shared Samsung/mobile layout */
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 640px) {
-    body {
-      padding-left: max(9px, env(safe-area-inset-left));
-      padding-right: max(9px, env(safe-area-inset-right));
-    }
-    .travel-options {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 13px;
-      width: 100%;
-    }
-    .travel-options > .form-group {
-      width: 100%;
+    .travel-options,
+    .travel-options > .form-group,
+    .travel-options .form-group.compact,
+    .travel-options .form-group.compact input,
+    .travel-options .form-group.compact select {
       min-width: 0;
+      box-sizing: border-box;
     }
     .travel-options .form-group.compact input,
     .travel-options .form-group.compact select {
-      display: block;
       width: 100%;
       max-width: 100%;
-      min-width: 0;
-      height: 48px;
-      box-sizing: border-box;
       font-size: 16px;
-      line-height: normal;
-      -webkit-appearance: none;
-      appearance: none;
     }
     .travel-options .form-group.compact input[type="time"] {
       direction: ltr;
       text-align: center;
-      padding-inline: 14px;
-      color-scheme: dark;
     }
-    .travel-options .form-group.compact select {
-      padding-inline: 14px 34px;
-      background-position: 17px 22px, 12px 22px;
-    }
-    .travel-options .form-group.compact label {
-      margin-bottom: 7px;
-      font-size: 12px;
-    }
-    #route-form { gap: 20px; }
   }
 }
