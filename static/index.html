@@ -22,14 +22,14 @@
       <form id="route-form" autocomplete="off">
         <div class="station-inputs">
           <div class="form-group"><label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label><div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div></div>
-          <button type="button" id="swap-btn" class="swap-btn" title="جابه‌جایی مبدأ و مقصد" aria-label="جابه‌جایی مبدأ و مقصد">↕</button>
+          <button type="button" id="swap-btn" class="swap-btn" title="جابه‌جایی مبدأ و مقصد" aria-label="جابه‌جایی مبدأ و مقصد"><svg class="swap-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v15m0 0-4-4m4 4 4-4M17 20V5m0 0-4 4m4-4 4 4"/></svg></button>
           <div class="form-group"><label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label><div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div></div>
         </div>
         <div class="travel-options">
           <div class="form-group compact"><label for="departure-time">ساعت حرکت</label><input type="time" id="departure-time" value="08:30"></div>
           <div class="form-group compact"><label for="day-type">روز حرکت</label><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></div>
         </div>
-        <button type="submit" id="submit-btn" class="submit-btn"><span>پیدا کردن مسیر</span><span class="button-arrow">←</span></button>
+        <button type="submit" id="submit-btn" class="submit-btn"><span>پیدا کردن مسیر</span><svg class="button-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m0 0 7-7m-7 7 7 7"/></svg></button>
       </form>
       <p class="form-hint">نام ایستگاه رو بنویس و از پیشنهادها انتخاب کن.</p>
     </section>
