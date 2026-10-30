@@ -17,37 +17,24 @@
       <img src="https://noza.ir/Alefbasystem/images/clients/11.png" alt="لوگوی متروی تهران" class="logo">
       <div class="header-copy"><span class="eyebrow">TEHRAN METRO</span><h1>مسیریاب متروی تهران</h1><p>مسیرت رو ساده‌تر پیدا کن</p></div>
     </header>
-
-    <section class="intro">
-      <span class="intro-mark">●</span>
-      <span>مبدأ و مقصدت رو انتخاب کن تا بهترین مسیر رو پیدا کنیم.</span>
-    </section>
-
+    <section class="intro"><span class="intro-mark">●</span><span>مبدأ و مقصدت رو انتخاب کن تا بهترین مسیر رو پیدا کنیم.</span></section>
     <section class="form-section">
       <form id="route-form" autocomplete="off">
         <div class="station-inputs">
-          <div class="form-group">
-            <label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label>
-            <div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div>
-          </div>
+          <div class="form-group"><label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label><div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div></div>
           <button type="button" id="swap-btn" class="swap-btn" title="جابه‌جایی مبدأ و مقصد" aria-label="جابه‌جایی مبدأ و مقصد">↕</button>
-          <div class="form-group">
-            <label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label>
-            <div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div>
-          </div>
+          <div class="form-group"><label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label><div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div></div>
         </div>
-
         <div class="travel-options">
           <div class="form-group compact"><label for="departure-time">ساعت حرکت</label><input type="time" id="departure-time" value="08:30"></div>
           <div class="form-group compact"><label for="day-type">روز حرکت</label><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></div>
         </div>
         <button type="submit" id="submit-btn" class="submit-btn"><span>پیدا کردن مسیر</span><span class="button-arrow">←</span></button>
       </form>
-      <p class="form-hint">برای انتخاب دقیق‌تر، نام ایستگاه رو تایپ کن و از فهرست پیشنهادها انتخابش کن.</p>
+      <p class="form-hint">نام ایستگاه رو بنویس و از پیشنهادها انتخاب کن.</p>
     </section>
-
     <section id="result" class="result" aria-live="polite"></section>
-    <footer class="footer"><span>مسیریاب متروی تهران</span><span>زمان سفرها تخمینی است و اطلاعات زنده قطارها نیست.</span></footer>
+    <footer class="footer"><span>مسیریاب متروی تهران</span><span>زمان‌ها تخمینی‌اند · <a href="https://cdn.alibaba.ir/ostorage/alibaba-mag/wp-content/uploads/2025/01/Tehran-subway-map-PDF.pdf" target="_blank" rel="noopener">نقشه مرجع خطوط و ایستگاه‌ها</a></span></footer>
   </main>
   <script src="/app.js" defer></script>
 </body>
