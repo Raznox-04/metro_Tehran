@@ -3,371 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="مسیریاب متروی تهران - پیدا کردن بهترین مسیر بین ایستگاه‌های مترو">
+  <meta name="theme-color" content="#0c1424">
+  <meta name="description" content="مسیریاب متروی تهران؛ پیدا کردن کوتاه‌ترین و سریع‌ترین مسیر">
   <title>مسیریاب متروی تهران</title>
-  <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
+  <main class="container">
+    <header class="header">
       <img src="https://noza.ir/Alefbasystem/images/clients/11.png" alt="لوگوی متروی تهران" class="logo">
-      <h1>مسیریاب متروی تهران</h1>
-    </div>
-
-    <div class="app-description">
-      بهترین و کوتاه‌ترین مسیر بین ایستگاه‌های متروی تهران
-    </div>
-
-    <div class="form-section">
-      <form id="route-form">
-        <div class="form-group">
-          <label for="from">ایستگاه مبدا:</label>
-          <input type="text" id="from" placeholder="نام ایستگاه مبدا" required autocomplete="off">
+      <div class="header-copy"><span class="eyebrow">TEHRAN METRO</span><h1>مسیریاب متروی تهران</h1><p>مسیرت رو ساده‌تر پیدا کن</p></div>
+    </header>
+    <section class="intro"><span class="intro-mark">●</span><span>مبدأ و مقصدت رو انتخاب کن تا بهترین مسیر رو پیدا کنیم.</span></section>
+    <section class="form-section">
+      <form id="route-form" autocomplete="off">
+        <div class="station-inputs">
+          <div class="form-group"><label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label><div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div></div>
+          <button type="button" id="swap-btn" class="swap-btn" title="جابه‌جایی مبدأ و مقصد" aria-label="جابه‌جایی مبدأ و مقصد"><svg class="swap-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v15m0 0-4-4m4 4 4-4M17 20V5m0 0-4 4m4-4 4 4"/></svg></button>
+          <div class="form-group"><label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label><div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div></div>
         </div>
-
-        <div class="form-group">
-          <label for="to">ایستگاه مقصد:</label>
-          <input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off">
+        <div class="travel-options">
+          <div class="form-group compact"><label for="departure-time">ساعت حرکت</label><input type="time" id="departure-time" value="08:30"></div>
+          <div class="form-group compact"><label for="day-type">روز حرکت</label><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></div>
         </div>
-
-        <button type="submit" id="submit-btn">پیدا کردن مسیر</button>
+        <button type="submit" id="submit-btn" class="submit-btn"><span>پیدا کردن مسیر</span><svg class="button-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m0 0 7-7m-7 7 7 7"/></svg></button>
       </form>
-    </div>
-
-    <div id="result" class="result"></div>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('route-form');
-      const resultDiv = document.getElementById('result');
-      const submitBtn = document.getElementById('submit-btn');
-      const fromInput = document.getElementById('from');
-      const toInput = document.getElementById('to');
-
-      // ایجاد لیست پیشنهاد برای ورودی‌ها
-      function setupAutocomplete(input) {
-        let currentFocus;
-
-        input.addEventListener("input", function() {
-          const val = this.value;
-          closeAllLists();
-          if (!val || val.length < 2) return false;
-
-          currentFocus = -1;
-
-          fetch(`/api/stations/search?query=${encodeURIComponent(val)}`)
-            .then(res => {
-              if (!res.ok) throw new Error('خطا در جستجو');
-              return res.json();
-            })
-            .then(data => {
-              const list = document.createElement("div");
-              list.setAttribute("id", this.id + "-autocomplete-list");
-              list.setAttribute("class", "autocomplete-items");
-              this.parentNode.appendChild(list);
-
-              if (data.stations && data.stations.length > 0) {
-                data.stations.forEach(station => {
-                  const item = document.createElement("div");
-                  item.innerHTML = station;
-                  item.innerHTML += "<input type='hidden' value='" + station + "'>";
-                  item.addEventListener("click", function() {
-                    input.value = this.getElementsByTagName("input")[0].value;
-                    closeAllLists();
-                  });
-                  list.appendChild(item);
-                });
-              } else {
-                const item = document.createElement("div");
-                item.innerHTML = "ایستگاهی یافت نشد";
-                item.style.color = "#5a6783";
-                item.style.cursor = "default";
-                list.appendChild(item);
-              }
-            })
-            .catch(err => {
-              console.error('Error in autocomplete:', err);
-              fallbackAutocomplete(input, val);
-            });
-        });
-
-        // Fallback function if API fails
-        function fallbackAutocomplete(input, val) {
-          const commonStations = [
-            "تجریش", "قیطریه", "شهید صدر", "قلهک", "میرداماد", "شهید همت",
-            "شریعتی", "دروازه شمیران", "پانزده خرداد", "خیام", "میدان محمدیه",
-            "شوش", "پایانه جنوب", "بیمه", "دکتر حبیب‌الله", "میدان حر",
-            "توحید", "میدان صنعت", "یادگار امام", "شهرک غرب", "ایوانک",
-            "امام خمینی", "میدان انقلاب", "میدان آزادی", "شهید حقانی",
-            "تهرانپارس", "فردوسی", "طالقانی", "شهید باهنر", "دروازه دولت",
-            "کهریزک", "صادقیه", "فرهنگسرا", "قائم", "آزادگان", "شهید کلاهدوز",
-            "علامه جعفری", "شهید سلیمانی", "شهدای دولت‌آباد", "کوهسار", "بسیج",
-            "میدان کتاب", "شهید بهشتی", "میدان جهاد"
-          ];
-
-          const list = document.createElement("div");
-          list.setAttribute("id", input.id + "-autocomplete-list");
-          list.setAttribute("class", "autocomplete-items");
-          input.parentNode.appendChild(list);
-
-          const matches = commonStations.filter(station =>
-            station.toLowerCase().includes(val.toLowerCase())
-          );
-
-          if (matches.length > 0) {
-            matches.forEach(station => {
-              const item = document.createElement("div");
-                  item.innerHTML = station;
-                  item.innerHTML += "<input type='hidden' value='" + station + "'>";
-                  item.addEventListener("click", function() {
-                    input.value = this.getElementsByTagName("input")[0].value;
-                    closeAllLists();
-                  });
-                  list.appendChild(item);
-                });
-              } else {
-                const item = document.createElement("div");
-                item.innerHTML = "ایستگاهی یافت نشد";
-                item.style.color = "#5a6783";
-                item.style.cursor = "default";
-                list.appendChild(item);
-              }
-            }
-
-        input.addEventListener("keydown", function(e) {
-          let items = document.getElementById(this.id + "-autocomplete-list");
-          if (items) items = items.getElementsByTagName("div");
-
-          if (e.keyCode == 40) {
-            currentFocus++;
-            addActive(items);
-          } else if (e.keyCode == 38) { // فلش بالا
-            currentFocus--;
-            addActive(items);
-          } else if (e.keyCode == 13) { // اینتر
-            e.preventDefault();
-            if (currentFocus > -1 && items) {
-              items[currentFocus].click();
-            }
-          }
-        });
-
-        function addActive(items) {
-          if (!items) return false;
-          removeActive(items);
-          if (currentFocus >= items.length) currentFocus = 0;
-          if (currentFocus < 0) currentFocus = items.length - 1;
-          items[currentFocus].classList.add("autocomplete-active");
-        }
-
-        function removeActive(items) {
-          for (let i = 0; i < items.length; i++) {
-            items[i].classList.remove("autocomplete-active");
-          }
-        }
-
-        function closeAllLists(elmnt) {
-          const items = document.getElementsByClassName("autocomplete-items");
-          for (let i = 0; i < items.length; i++) {
-            if (elmnt != items[i] && elmnt != input) {
-              items[i].parentNode.removeChild(items[i]);
-            }
-          }
-        }
-
-        document.addEventListener("click", function(e) {
-          closeAllLists(e.target);
-        });
-      }
-
-      // راه‌اندازی autocomplete برای هر دو فیلد
-      setupAutocomplete(fromInput);
-      setupAutocomplete(toInput);
-
-      // مدیریت ارسال فرم
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const from = fromInput.value.trim();
-        const to = toInput.value.trim();
-
-        if (!from || !to) {
-          showError('لطفاً هر دو ایستگاه را وارد کنید');
-          return;
-        }
-
-        if (from === to) {
-          showError('ایستگاه مبدا و مقصد نمی‌توانند یکسان باشند');
-          return;
-        }
-
-        setLoadingState(true);
-
-        try {
-          const res = await fetch(`/api/route/details?from_station=${encodeURIComponent(from)}&to_station=${encodeURIComponent(to)}`);
-          const data = await res.json();
-
-          if (!res.ok) {
-            throw new Error(data.detail || 'خطا در دریافت مسیر');
-          }
-
-          showRoute(data);
-
-        } catch (err) {
-          console.error('خطا در ارتباط با سرور:', err);
-          showError(err.message || 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
-        } finally {
-          setLoadingState(false);
-        }
-      });
-
-      function setLoadingState(isLoading) {
-        if (isLoading) {
-          submitBtn.disabled = true;
-          submitBtn.innerHTML = 'در حال جستجو <span class="loading"></span>';
-        } else {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'پیدا کردن مسیر';
-        }
-      }
-
-      function showError(message) {
-        resultDiv.innerHTML = `<div class="error">${message}</div>`;
-      }
-
-      function showRoute(data) {
-        const { route, route_details, stops, total_stations } = data;
-
-        let routeHTML = `
-          <div class="route-info">
-            <div class="route-summary">
-              <div class="summary-item">
-                <span class="summary-value">${total_stations}</span>
-                <span class="summary-label">ایستگاه</span>
-              </div>
-            </div>
-          </div>ب
-        `;
-
-        // گروه‌بندی مسیر بر اساس خطوط
-        const routeGroups = groupRouteByLines(route_details);
-
-        routeHTML += `<div class="route-sections">`;
-
-        routeGroups.forEach((group) => {
-          const lineNumber = group.lines[0];
-          const lineName = getLineName(lineNumber);
-          const lineColor = getLineColor(lineNumber);
-
-          routeHTML += `
-            <div class="route-section">
-              <div class="line-header" style="background-color: ${lineColor}">
-                <span>${lineName}</span>
-              </div>
-              <ul class="station-list">
-          `;
-
-          group.stations.forEach((station, stationIndex) => {
-            const lineBadges = station.lines.map(line =>
-              `<span class="line-badge line-${line}">${getLineName(line)}</span>`
-            ).join('');
-
-            routeHTML += `
-              <li>
-                <div class="station-info">
-                  ${lineBadges}
-                  <span>${station.name}</span>
-                </div>
-                <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">${stationIndex + 1}</span>
-              </li>
-            `;
-          });
-
-          routeHTML += `
-              </ul>
-            </div>
-          `;
-        });
-
-        routeHTML += `</div>`;
-        resultDiv.innerHTML = routeHTML;
-      }
-
-      // توابع کمکی
-      function groupRouteByLines(routeDetails) {
-        const groups = [];
-        let currentGroup = {
-          lines: routeDetails[0]?.lines || [1],
-          stations: []
-        };
-
-        routeDetails.forEach((station, index) => {
-          if (!arraysEqual(currentGroup.lines, station.lines)) {
-            groups.push(currentGroup);
-            currentGroup = {
-              lines: station.lines,
-              stations: []
-            };
-          }
-
-          currentGroup.stations.push(station);
-
-          if (index === routeDetails.length - 1) {
-            groups.push(currentGroup);
-          }
-        });
-
-        return groups;
-      }
-
-      function arraysEqual(arr1, arr2) {
-        if (arr1.length !== arr2.length) return false;
-        return arr1.every((value, index) => value === arr2[index]);
-      }
-
-      function getLineName(lineNumber) {
-        const lineNames = {
-          1: "خط ۱",
-          2: "خط ۲",
-          3: "خط ۳",
-          4: "خط ۴",
-          5: "خط ۵",
-          6: "خط ۶",
-          7: "خط ۷"
-        };
-        return lineNames[lineNumber] || `خط ${lineNumber}`;
-      }
-
-      function getLineColor(lineNumber) {
-        const lineColors = {
-          1: "#E0001F",
-          2: "#2F4389",
-          3: "#67C5F5",
-          4: "#F8E100",
-          5: "#007E46",
-          6: "#EF639F",
-          7: "#7F0B74"
-        };
-        return lineColors[lineNumber] || "#E0001F";
-      }
-      fromInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && !e.shiftKey) {
-          e.preventDefault();
-          toInput.focus();
-        }
-      });
-
-      toInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Tab' && e.shiftKey) {
-          e.preventDefault();
-          fromInput.focus();
-        }
-      });
-    });
-  </script>
+      <p class="form-hint">نام ایستگاه رو بنویس و از پیشنهادها انتخاب کن.</p>
+    </section>
+    <section id="result" class="result" aria-live="polite"></section>
+    <footer class="footer">
+<div class="footer-project"><strong>مسیریاب متروی تهران</strong><span>زمان‌ها تخمینی‌اند · <a href="https://cdn.alibaba.ir/ostorage/alibaba-mag/wp-content/uploads/2025/01/Tehran-subway-map-PDF.pdf" target="_blank" rel="noopener noreferrer">نقشه مرجع خطوط و ایستگاه‌ها</a></span></div>
+<div class="footer-author"><span>طراحی و توسعه توسط <strong>Mohammad Sadra</strong></span><nav class="author-links" aria-label="راه‌های ارتباطی با سازنده">
+<a href="https://github.com/Raznox-04" target="_blank" rel="noopener noreferrer" aria-label="GitHub سازنده" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 6v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.7a5.2 5.2 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.6S17.5 1.2 14 3.5a13 13 0 0 0-7 0C3.5 1.2 2.3 1.5 2.3 1.5a4.8 4.8 0 0 0-.1 3.6A5.2 5.2 0 0 0 .8 8.7c0 5.2 3.1 6.4 6.1 6.7A3.4 3.4 0 0 0 6 18.1V22"/></svg></a>
+<a href="https://t.me/raznox" target="_blank" rel="noopener noreferrer" aria-label="تلگرام سازنده" title="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.5 3.5-3.2 16c-.2 1.1-.8 1.4-1.7.9l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.8 8.8-8c.4-.4-.1-.6-.6-.2L6.3 13.5l-4.6-1.4c-1-.3-1-1 .2-1.5L20 3.1c.9-.3 1.7.2 1.5.4Z"/></svg></a>
+<a href="mailto:sadrakhamesi.webdev@gmail.com" aria-label="ایمیل سازنده" title="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></a>
+</nav></div></footer>
+  </main>
+  <script src="/app.js" defer></script>
 </body>
 </html>
