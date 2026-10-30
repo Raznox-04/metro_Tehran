@@ -53,6 +53,25 @@ def get_fastest_route(
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.get("/stations/map")
+def get_stations_map():
+    """داده‌های موردنیاز برای ترسیم نقشه تعاملی شبکه مترو."""
+    data = metro_service.get_all_stations_data()
+    stations = []
+    for station_id, info in data.items():
+        translations = info.get("translations", {})
+        stations.append({
+            "id": station_id,
+            "name": station_id,
+            "fa": translations.get("fa", station_id),
+            "latitude": info.get("latitude"),
+            "longitude": info.get("longitude"),
+            "lines": info.get("lines", []),
+            "relations": info.get("relations", [])
+        })
+    return {"stations": stations}
+
+
 @router.get("/stations/search")
 def search_stations(query: str = Query(..., description="جستجوی ایستگاه")):
     matches = metro_service.find_similar_stations(query)
