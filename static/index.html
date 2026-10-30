@@ -14,44 +14,50 @@
 <body>
   <main class="container">
     <header class="header">
-      <img src="https://www.svgrepo.com/show/184062/train-subway.svg" alt="نماد قطار مترو" class="logo">
+      <img src="https://noza.ir/Alefbasystem/images/clients/11.png" alt="لوگوی متروی تهران" class="logo">
       <div class="header-copy"><span class="eyebrow">TEHRAN METRO</span><h1>مسیریاب متروی تهران</h1><p>مسیرت رو ساده‌تر پیدا کن</p></div>
     </header>
-    <section class="intro"><span class="intro-mark">●</span><span>مبدأ و مقصدت رو انتخاب کن تا بهترین مسیر رو پیدا کنیم.</span></section>
+
+    <section class="intro">
+      <span class="intro-mark">●</span>
+      <span>مبدأ و مقصدت رو انتخاب کن تا بهترین مسیر رو پیدا کنیم.</span>
+    </section>
+
     <section class="form-section">
       <form id="route-form" autocomplete="off">
         <div class="station-inputs">
-          <div class="form-group"><label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label><div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div></div>
+          <div class="form-group">
+            <label for="from"><span class="field-dot origin"></span>ایستگاه مبدأ</label>
+            <div class="input-wrap"><input type="text" id="from" placeholder="نام ایستگاه مبدأ" required autocomplete="off"><div id="from-list" class="autocomplete-items"></div></div>
+          </div>
           <button type="button" id="swap-btn" class="swap-btn" title="جابه‌جایی مبدأ و مقصد" aria-label="جابه‌جایی مبدأ و مقصد"><svg class="swap-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v15m0 0-4-4m4 4 4-4M17 20V5m0 0-4 4m4-4 4 4"/></svg></button>
-          <div class="form-group"><label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label><div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div></div>
+          <div class="form-group">
+            <label for="to"><span class="field-dot destination"></span>ایستگاه مقصد</label>
+            <div class="input-wrap"><input type="text" id="to" placeholder="نام ایستگاه مقصد" required autocomplete="off"><div id="to-list" class="autocomplete-items"></div></div>
+          </div>
         </div>
+
         <div class="travel-options">
           <div class="form-group compact"><label for="departure-time">ساعت حرکت</label><input type="time" id="departure-time" value="08:30"></div>
           <div class="form-group compact"><label for="day-type">روز حرکت</label><select id="day-type"><option value="weekday">روز کاری</option><option value="weekend">روز تعطیل</option></select></div>
         </div>
         <button type="submit" id="submit-btn" class="submit-btn"><span>پیدا کردن مسیر</span><svg class="button-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m0 0 7-7m-7 7 7 7"/></svg></button>
       </form>
-      <p class="form-hint">نام ایستگاه رو بنویس و از پیشنهادها انتخاب کن.</p>
+      <p class="form-hint">برای انتخاب دقیق‌تر، نام ایستگاه رو تایپ کن و از فهرست پیشنهادها انتخابش کن.</p>
     </section>
+
     <section id="result" class="result" aria-live="polite"></section>
-    <details class="map-panel">
-      <summary>
-        <span class="map-summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6.5 8 4l8 3 5-2.5v13L16 20l-8-3-5 2.5zM8 4v13m8-10v13"/></svg></span>
-        <span class="map-summary-copy"><strong>نقشه خطوط متروی تهران</strong><small>مشاهده نقشه در منبع شرکت بهره‌برداری مترو</small></span>
-        <svg class="map-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
-      </summary>
-      <div class="map-content">
-        <div class="map-frame-wrap"><iframe src="https://metro.tehran.ir/Default.aspx?tabid=835" title="نقشه متروی تهران در وب‌سایت شرکت بهره‌برداری مترو" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-        <div class="map-actions"><a href="https://metro.tehran.ir/Default.aspx?tabid=835" target="_blank" rel="noopener noreferrer" class="map-link">باز کردن نقشه در سایت مترو <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6m0-6-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a><span>منبع نقشه: شرکت بهره‌برداری راه‌آهن شهری تهران و حومه</span></div>
-      </div>
-    </details>
     <footer class="footer">
-<div class="footer-project"><strong>مسیریاب متروی تهران</strong><span>زمان‌ها تخمینی‌اند · <a href="https://cdn.alibaba.ir/ostorage/alibaba-mag/wp-content/uploads/2025/01/Tehran-subway-map-PDF.pdf" target="_blank" rel="noopener noreferrer">نقشه مرجع خطوط و ایستگاه‌ها</a></span></div>
-<div class="footer-author"><span>طراحی و توسعه توسط <strong>Mohammad Sadra</strong></span><nav class="author-links" aria-label="راه‌های ارتباطی با سازنده">
-<a href="https://github.com/Raznox-04" target="_blank" rel="noopener noreferrer" aria-label="GitHub سازنده" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 6v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.7a5.2 5.2 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.6S17.5 1.2 14 3.5a13 13 0 0 0-7 0C3.5 1.2 2.3 1.5 2.3 1.5a4.8 4.8 0 0 0-.1 3.6A5.2 5.2 0 0 0 .8 8.7c0 5.2 3.1 6.4 6.1 6.7A3.4 3.4 0 0 0 6 18.1V22"/></svg></a>
-<a href="https://t.me/raznox" target="_blank" rel="noopener noreferrer" aria-label="تلگرام سازنده" title="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.5 3.5-3.2 16c-.2 1.1-.8 1.4-1.7.9l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.8 8.8-8c.4-.4-.1-.6-.6-.2L6.3 13.5l-4.6-1.4c-1-.3-1-1 .2-1.5L20 3.1c.9-.3 1.7.2 1.5.4Z"/></svg></a>
-<a href="mailto:sadrakhamesi.webdev@gmail.com" aria-label="ایمیل سازنده" title="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></a>
-</nav><a class="icon-credit" href="https://www.svgrepo.com/" target="_blank" rel="noopener noreferrer">آیکون قطار از SVG Repo</a></div></footer>
+  <div class="footer-copy"><span>مسیریاب متروی تهران</span><span>زمان سفرها تخمینی است و اطلاعات زنده قطارها نیست.</span></div>
+  <div class="footer-author">
+    <span>طراحی و توسعه توسط <strong>Mohammad Sadra</strong></span>
+    <nav class="author-links" aria-label="راه‌های ارتباطی با سازنده">
+      <a href="https://github.com/Raznox-04" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 6v-3.9a3.4 3.4 0 0 0-.9-2.7c3-.3 6.1-1.5 6.1-6.7a5.2 5.2 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.6S17.5 1.2 14 3.5a13 13 0 0 0-7 0C3.5 1.2 2.3 1.5 2.3 1.5a4.8 4.8 0 0 0-.1 3.6A5.2 5.2 0 0 0 .8 8.7c0 5.2 3.1 6.4 6.1 6.7A3.4 3.4 0 0 0 6 18.1V22"/></svg></a>
+      <a href="https://t.me/raznox" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.5 3.5-3.2 16c-.2 1.1-.8 1.4-1.7.9l-4.7-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.4-4.8 8.8-8c.4-.4-.1-.6-.6-.2L6.3 13.5l-4.6-1.4c-1-.3-1-1 .2-1.5L20 3.1c.9-.3 1.7.2 1.5.4Z"/></svg></a>
+      <a href="mailto:sadrakhamesi.webdev@gmail.com" aria-label="Email" title="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></a>
+    </nav>
+  </div>
+</footer>
   </main>
   <script src="/app.js" defer></script>
 </body>
