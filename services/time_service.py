@@ -261,6 +261,16 @@ class MetroTimeService:
                 })
 
         route_fa = [metro_service.translate_to_persian(name) for name in route_english]
+        route_details = []
+        for station_name in route_fa:
+            station_info = metro_service.get_station_info(station_name)
+            if station_info:
+                route_details.append({
+                    "name": station_name,
+                    "lines": station_info.get("lines", [1]),
+                    "colors": station_info.get("colors", ["#E0001F"]),
+                    "is_transfer": len(station_info.get("lines", [])) > 1,
+                })
         total_minutes = ride_minutes + waiting_minutes + transfer_minutes_total
         arrival = datetime.strptime(departure_time, "%H:%M") + timedelta(minutes=total_minutes)
         closing = self._to_minutes(self.schedule["service_hours"]["closes"])
@@ -271,6 +281,8 @@ class MetroTimeService:
 
         return {
             "route": route_fa,
+            "route_details": route_details,
+            "total_stations": len(route_fa),
             "stops": max(0, len(route_fa) - 1),
             "transfer_count": len(transfers),
             "transfer_stations": [item["station"] for item in transfers],
