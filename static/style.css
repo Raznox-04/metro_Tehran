@@ -92,3 +92,46 @@ select option{background:#17243a;color:#fff}
 .author-links a:hover{background:#f2c94c18;color:var(--accent);border-color:#f2c94c66;transform:translateY(-2px)}
 .author-links svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:640px){.footer{align-items:flex-start}.footer-copy,.footer-author{width:100%;justify-content:center;text-align:center}.footer-author{margin-inline-start:0;gap:8px}.author-links{width:100%;justify-content:center;margin-top:3px}}
+
+/* Responsive layout hardening: prevent form and route cards from colliding */
+body{overflow-x:hidden}
+.container,.form-section,#route-form,.result,.route-summary,.summary-card{min-width:0;max-width:100%}
+.station-inputs>.form-group,.travel-options>.form-group{min-width:0;width:100%}
+.station-inputs input,.travel-options input,.travel-options select{min-width:0;max-width:100%}
+.logo{flex:0 0 auto;object-fit:contain;background:#fff;padding:5px}
+.route-switch button{min-width:0;overflow-wrap:anywhere}
+.route-item{min-width:0;flex-wrap:wrap}
+.station-name{min-width:0;overflow-wrap:anywhere}
+.station-meta{min-width:0;max-width:60%;flex-wrap:wrap}
+.transfer-note{min-width:0;max-width:100%;flex-wrap:wrap}
+@media(max-width:760px){
+  body{padding:14px 10px 22px}
+  .container{width:100%;padding:clamp(16px,3.5vw,24px);border-radius:18px}
+  .station-inputs{grid-template-columns:minmax(0,1fr);gap:9px;align-items:stretch}
+  .station-inputs>.form-group{grid-column:1}
+  .swap-btn{justify-self:center;align-self:center;width:38px;height:34px;margin:0;transform:rotate(90deg)}
+  .swap-btn:hover{transform:rotate(270deg)}
+  .station-inputs input{height:46px}
+  .travel-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .form-section{padding:clamp(13px,3vw,20px)}
+  .route-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .summary-card{padding:11px 5px}
+  .footer{gap:10px}
+}
+@media(max-width:420px){
+  body{padding:9px 7px 16px}
+  .container{padding:15px 11px}
+  .header{gap:10px}
+  .logo{width:58px;height:58px}
+  .header-copy h1{font-size:18px}
+  .travel-options{grid-template-columns:minmax(0,1fr)}
+  .travel-options .form-group.compact input,.travel-options .form-group.compact select{height:45px}
+  .submit-btn{width:100%;min-width:0}
+  .route-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .summary-value{font-size:17px}
+  .summary-label{font-size:9px;line-height:1.5}
+  .time-breakdown{justify-content:flex-start}
+  .station-meta{max-width:55%}
+  .transfer-note{margin-inline-start:0;font-size:9px}
+  .footer-copy,.footer-author{justify-content:flex-start;text-align:right}
+}
