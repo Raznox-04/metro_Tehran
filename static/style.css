@@ -148,3 +148,11 @@ body{overflow-x:hidden}
   .travel-options{row-gap:13px}
   #route-form{gap:20px}
 }
+
+/* Keep departure time and day selector visually separated */
+.travel-options{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;row-gap:12px}
+.travel-options>.form-group{min-width:0}
+.travel-options input,.travel-options select{width:100%;min-width:0}
+@media(max-width:420px){
+  .travel-options{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px;row-gap:12px}
+}
