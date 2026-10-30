@@ -97,13 +97,16 @@
     const stops=data.stops ?? Math.max(0,(data.route||[]).length-1);
     const transfers=data.transfer_count ?? (data.transfers||[]).length;
     const lines=(data.lines_used||[]).length;
+    const hasEstimate = mode === "fastest" && data.estimated_time;
     const items=[
-      [minutesLabel(total),"زمان تخمینی"],
+      [hasEstimate ? minutesLabel(total) : "—",hasEstimate ? "زمان تخمینی" : "زمان محاسبه نشده"],
       [stops+"","تعداد ایستگاه"],
       [transfers+"","تعویض خط"],
       [lines+"","خط در مسیر"]
     ];
-    $("#journey-overview").innerHTML=items.map(([value,label])=>'<div class="overview-item"><div class="overview-value">'+escapeHTML(value)+'</div><div class="overview-label">'+label+'</div></div>').join("");
+    const summary=items.map(([value,label])=>'<div class="overview-item"><div class="overview-value">'+escapeHTML(value)+'</div><div class="overview-label">'+label+'</div></div>').join("");
+    const breakdown=hasEstimate ? '<div class="time-breakdown"><span>حرکت قطار <b>'+minutesLabel(time.travel_minutes)+'</b></span><span>انتظار <b>'+minutesLabel(time.waiting_minutes)+'</b></span><span>تعویض خط <b>'+minutesLabel(time.transfer_minutes)+'</b></span></div>' : '';
+    $("#journey-overview").innerHTML=summary+breakdown;
   }
   function renderTimeline(data, mode) {
     const route=data.route||[];
